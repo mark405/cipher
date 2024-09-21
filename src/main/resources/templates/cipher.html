@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Криптографічна система</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .menu {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+
+        .menu button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .file-input {
+            margin-bottom: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 200px;
+            margin-bottom: 20px;
+        }
+
+        .developer-info {
+            text-align: center;
+            margin-top: 40px;
+            font-style: italic;
+        }
+
+        .exit {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Криптографічна система</h1>
+
+<div class="menu">
+    <button onclick="saveFile()">Зберегти файл</button>
+    <button onclick="printFile()">Друкувати файл</button>
+    <button onclick="encrypt()">Шифрувати</button>
+    <button onclick="decrypt()">Розшифрувати</button>
+    <button onclick="showDeveloperInfo()">Про розробника</button>
+    <button onclick="exitSystem()">Вихід</button>
+</div>
+
+<div class="file-input">
+    <input type="file" id="fileInput" />
+</div>
+
+<textarea id="fileContent" placeholder="Тут буде відображено вміст файлу..."></textarea>
+
+<div class="developer-info" id="developerInfo" style="display: none;">
+    <p>Розробник: Марк Завгородній</p>
+</div>
+
+<div class="exit">
+    <button onclick="exitSystem()">Вихід з системи</button>
+</div>
+
+<script>
+
+    function saveFile() {
+        const content = document.getElementById('fileContent').value;
+        const blob = new Blob([content], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'encrypted_file.txt';
+        link.click();
+    }
+
+    function printFile() {
+        const content = document.getElementById('fileContent').value;
+        const printWindow = window.open('', '', 'width=600,height=400');
+        printWindow.document.write('<pre>' + content + '</pre>');
+        printWindow.document.close();
+        printWindow.print();
+    }
+
+    async function encrypt() {
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+        const key = prompt('Введіть ключ шифрування:');
+        const language = prompt('Введіть мову (українська або англійська):');
+
+        if (key && language && file) {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("key", key);
+            formData.append("language", language);
+
+            const response = await fetch("/crypto/encrypt", {
+                method: "POST",
+                body: formData
+            });
+
+            const encryptedContent = await response.text();
+            document.getElementById('fileContent').value = encryptedContent;
+            alert('Шифрування завершено!');
+        } else {
+            alert('Будь ласка, виберіть файл, введіть ключ і мову.');
+        }
+    }
+
+    async function decrypt() {
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+        const key = prompt('Введіть ключ для розшифрування:');
+        const language = prompt('Введіть мову (українська або англійська):');
+
+        if (key && language && file) {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("key", key);
+            formData.append("language", language);
+
+            const response = await fetch("/crypto/decrypt", {
+                method: "POST",
+                body: formData
+            });
+
+            const decryptedContent = await response.text();
+            document.getElementById('fileContent').value = decryptedContent;
+            alert('Розшифрування завершено!');
+        } else {
+            alert('Будь ласка, виберіть файл, введіть ключ і мову.');
+        }
+    }
+
+    async function showDeveloperInfo() {
+        const response = await fetch("/crypto/developer");
+        const developerInfo = await response.text();
+        alert(developerInfo);
+    }
+
+    function exitSystem() {
+        if (confirm('Ви дійсно хочете вийти з системи?')) {
+            fetch("/crypto/exit", { method: "POST" });
+        }
+    }
+</script>
+
+</body>
+</html>
