@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<html lang="uk">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -111,8 +111,7 @@
                 body: formData
             });
 
-            const encryptedContent = await response.text();
-            document.getElementById('fileContent').value = encryptedContent;
+            document.getElementById('fileContent').value = await response.text();
             alert('Шифрування завершено!');
         } else {
             alert('Будь ласка, виберіть файл, введіть ключ і мову.');
@@ -136,8 +135,7 @@
                 body: formData
             });
 
-            const decryptedContent = await response.text();
-            document.getElementById('fileContent').value = decryptedContent;
+            document.getElementById('fileContent').value = await response.text();
             alert('Розшифрування завершено!');
         } else {
             alert('Будь ласка, виберіть файл, введіть ключ і мову.');

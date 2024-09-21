@@ -12,7 +12,8 @@ public class CryptoServiceImpl implements CryptoService {
     public String encrypt(String text, int key, String language) {
         String alphabet = getAlphabet(language);
         int n = alphabet.length();
-        key = key % n; // Ensure key is within alphabet range
+        key = ((key % n) + n) % n; // Normalize key to be within alphabet range, positive
+
         StringBuilder result = new StringBuilder();
 
         for (char c : text.toLowerCase().toCharArray()) {
